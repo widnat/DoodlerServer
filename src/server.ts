@@ -12,9 +12,9 @@ doodler.use(cors({
 const server = http.createServer(doodler);
 
 //initialize the WebSocket server instance
-const wss = new WebSocket.Server({ server });
+const webSocketServer = new WebSocket.Server({ server });
 
-wss.on('connection', (ws: WebSocket) => {
+webSocketServer.on('connection', (ws: WebSocket) => {
 
     //connection is up, let's add a simple simple event
     ws.on('message', (message: string) => {
