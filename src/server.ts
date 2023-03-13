@@ -1,12 +1,12 @@
 import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
-import { AddPlayerUpdate, Message, Connection, Game } from './types';
+import { Message, Game } from './types';
 const port = 8080;
 const doodler = express();
 const cors = require('cors');
 doodler.use(cors({
-    origin: 'http://localhost:3000'
+    origin: 'http://localhost:3000*'
 })); 
 let games = new Map<number, Game>();
 var newGameIndex = 0;
@@ -48,9 +48,12 @@ server.listen(process.env.PORT || port, () => {
 });
 
 function handleClientMessage(msg: string, webSocket: WebSocket) {
-    // const message = JSON.parse(msg) as Message;
-    // if (message.type === "add player") {
-    //     const addPlayerUpdate = JSON.parse(message.value) as AddPlayerUpdate;
-    //     addPlayerUpdate.
-    // }
+    const message = JSON.parse(msg) as Message;
+    if (message.type === "add player") {
+        var game = games.get(message.gameIndex);
+        if (game) {
+            let presenterWebSocket = game.presenterWebSocket;
+            presenterWebSocket.send(msg);
+        }
+    }
 }

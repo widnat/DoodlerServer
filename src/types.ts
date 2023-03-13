@@ -7,15 +7,11 @@ export type Game = {
 
 export type Message = {
     type: string;
+    gameIndex: number;
     value: string;
 }
 
-export type Connection = {
-    webSocketType: string;
-    gameIndex: number;
-}
-
-export type AddPlayerUpdate = {
+export type AddPlayerMessage = {
     name: string;
     imageUrl: string;
 }
