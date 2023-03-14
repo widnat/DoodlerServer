@@ -16,8 +16,8 @@ const webSocketServer = new WebSocket.Server({ server });
 
 webSocketServer.on('connection', (webSocket: WebSocket) => {
 
-    webSocket.on('message', (message: string) => {
-        handleClientMessage(message, webSocket)
+    webSocket.on('message', (message: string, isBinary) => {
+        handleClientMessage(message, isBinary)
         // ws.send(`Hello, you sent -> ${message}`);
     });
 
@@ -47,12 +47,13 @@ server.listen(process.env.PORT || port, () => {
     console.log(`Server started on port ${port} :)`);
 });
 
-function handleClientMessage(msg: string, webSocket: WebSocket) {
+function handleClientMessage(msg: string, isBinary: boolean) {
     const message = JSON.parse(msg) as Message;
     if (message.type === "add player") {
         var game = games.get(message.gameIndex);
         if (game) {
             let presenterWebSocket = game.presenterWebSocket;
+            msg = isBinary ? msg : msg.toString();
             presenterWebSocket.send(msg);
         }
     }
