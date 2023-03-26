@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
-import { Message, Game } from './types';
+import { Message, Game, PlayerWebSocket } from './types';
 const port = 8080;
 const doodler = express();
 const cors = require('cors');
@@ -18,13 +18,13 @@ webSocketServer.on('connection', (webSocket: WebSocket) => {
 
     webSocket.on('message', (message: string, isBinary) => {
         handleClientMessage(message, isBinary)
-        // ws.send(`Hello, you sent -> ${message}`);
+        // webSocket.send(`Hello, you sent -> ${message}`);
     });
-
+    
     if (webSocket.protocol === "presenter") {
         const newGame = {
             presenterWebSocket: webSocket,
-            childrenWebSockets: new Array<WebSocket>,
+            playerWebSockets: new Array<PlayerWebSocket>,
         } as Game;
         games.set(newGameIndex, newGame);
         var response = {
@@ -38,10 +38,28 @@ webSocketServer.on('connection', (webSocket: WebSocket) => {
     else if (!isNaN(+webSocket.protocol)) {
         var gameIndex = Number(webSocket.protocol);
         var game = games.get(gameIndex);
-        if (game)
-            game.childrenWebSockets.push(webSocket);
+        if (game) {
+            let playerId = game.playerWebSockets.length;
+            let playerWebSocket = {
+                playerId: playerId,
+                playerWebSocket: webSocket
+            } as PlayerWebSocket;
+            game.playerWebSockets.push(playerWebSocket);
+
+            var response = {
+                type: "player id",
+                value: String(playerId)
+            } as Message;
+            var jsonResponse = JSON.stringify(response);
+            webSocket.send(jsonResponse);
+        }
     }
 });
+
+//presenter creates a new connection and says to close, remove the old presenter and put this presenter in its place
+// then the presenter tells the children to go to the next round
+// the children tell the server to close the connection and remove the child
+// the child goes to the next round and makes a new connection
 
 server.listen(process.env.PORT || port, () => {
     console.log(`Server started on port ${port} :)`);
@@ -57,4 +75,14 @@ function handleClientMessage(msg: string, isBinary: boolean) {
             presenterWebSocket.send(msg);
         }
     }
+    else if (message.type === "draw image") {
+        var game = games.get(message.gameIndex);
+        if (game) {
+            game.playerWebSockets.forEach(webSocket => {
+                msg = isBinary ? msg : msg.toString();
+                webSocket.send(msg);
+            });
+        }
+    }
+    
 }
