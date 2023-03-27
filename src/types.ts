@@ -7,12 +7,13 @@ export type Game = {
 
 export type PlayerWebSocket = {
     playerId: number;
-    playerWebSocket: WebSocket;
+    webSocket: WebSocket;
 }
 
 export type Message = {
     type: string;
     gameIndex: number;
+    playerId: number;
     value: string;
 }
 

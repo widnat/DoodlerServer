@@ -42,7 +42,7 @@ webSocketServer.on('connection', (webSocket: WebSocket) => {
             let playerId = game.playerWebSockets.length;
             let playerWebSocket = {
                 playerId: playerId,
-                playerWebSocket: webSocket
+                webSocket: webSocket
             } as PlayerWebSocket;
             game.playerWebSockets.push(playerWebSocket);
 
@@ -67,7 +67,7 @@ server.listen(process.env.PORT || port, () => {
 
 function handleClientMessage(msg: string, isBinary: boolean) {
     const message = JSON.parse(msg) as Message;
-    if (message.type === "add player") {
+    if (message.type === "add player" || message.type === "submit doodle") {
         var game = games.get(message.gameIndex);
         if (game) {
             let presenterWebSocket = game.presenterWebSocket;
@@ -75,13 +75,12 @@ function handleClientMessage(msg: string, isBinary: boolean) {
             presenterWebSocket.send(msg);
         }
     }
-    else if (message.type === "draw image") {
+    else if (message.type === "create doodle") {
         var game = games.get(message.gameIndex);
         if (game) {
-            game.playerWebSockets.forEach(webSocket => {
-                msg = isBinary ? msg : msg.toString();
-                webSocket.send(msg);
-            });
+            msg = isBinary ? msg : msg.toString();
+            let playerWebSocket = game.playerWebSockets[message.playerId];
+            playerWebSocket.webSocket.send(msg);
         }
     }
     
