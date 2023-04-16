@@ -67,7 +67,7 @@ server.listen(process.env.PORT || port, () => {
 
 function handleClientMessage(msg: string, isBinary: boolean) {
     const message = JSON.parse(msg) as Message;
-    if (message.type === "add player" || message.type === "submit doodle") {
+    if (message.type === "add player" || message.type === "submit assignment doodle") {
         var game = games.get(message.gameIndex);
         if (game) {
             let presenterWebSocket = game.presenterWebSocket;
