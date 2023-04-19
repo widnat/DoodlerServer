@@ -67,7 +67,10 @@ server.listen(process.env.PORT || port, () => {
 
 function handleClientMessage(msg: string, isBinary: boolean) {
     const message = JSON.parse(msg) as Message;
-    if (message.type === "add player" || message.type === "submit assignment doodle") {
+    var receivedMessage = "recieved message type: " + message.type;
+    console.log(receivedMessage);
+    if (message.type === "add player" || message.type === "submit assignment doodle" || message.type === "submit first guess") {
+        console.log("sending message to presenter");
         var game = games.get(message.gameIndex);
         if (game) {
             let presenterWebSocket = game.presenterWebSocket;
@@ -75,7 +78,9 @@ function handleClientMessage(msg: string, isBinary: boolean) {
             presenterWebSocket.send(msg);
         }
     }
-    else if (message.type === "create doodle") {
+    else if (message.type === "create doodle" || message.type === "sit back and relax" || message.type === "time to guess") {
+        var sendingMessage = "sending message to playerId: " + message.playerId;
+        console.log(sendingMessage);
         var game = games.get(message.gameIndex);
         if (game) {
             msg = isBinary ? msg : msg.toString();
