@@ -1,3 +1,10 @@
+This is a server that serves as the backend for my Doodler game.
+The Doodler game is a mirrored after Drawful from Jackbox games.
+
+I used websockets to to communicate between the game presenter, the server, and the players.
+
+Things to remember
+
 mkdir websocket-node-express
 cd websocket-node-express
 npm init
