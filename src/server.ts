@@ -56,7 +56,7 @@ webSocketServer.on('connection', (webSocket: WebSocket) => {
     }
 });
 
-//presenter creates a new connection and says to close, remove the old presenter and put this presenter in its place
+// presenter creates a new connection and says to close, remove the old presenter and put this presenter in its place
 // then the presenter tells the children to go to the next round
 // the children tell the server to close the connection and remove the child
 // the child goes to the next round and makes a new connection
@@ -69,7 +69,7 @@ function handleClientMessage(msg: string, isBinary: boolean) {
     const message = JSON.parse(msg) as Message;
     var receivedMessage = "recieved message type: " + message.type;
     console.log(receivedMessage);
-    if (message.type === "add player" || message.type === "submit assignment doodle" || message.type === "submit first guess") {
+    if (message.type === "add player" || message.type === "submit assignment doodle" || message.type === "submit first guess" || message.type === "submit second guess") {
         console.log("sending message to presenter");
         var game = games.get(message.gameIndex);
         if (game) {
@@ -78,7 +78,7 @@ function handleClientMessage(msg: string, isBinary: boolean) {
             presenterWebSocket.send(msg);
         }
     }
-    else if (message.type === "create doodle" || message.type === "sit back and relax" || message.type === "time to guess") {
+    else if (message.type === "create doodle" || message.type === "sit back and relax" || message.type === "time to guess" || message.type === "time to guess again") {
         var sendingMessage = "sending message to playerId: " + message.playerId;
         console.log(sendingMessage);
         var game = games.get(message.gameIndex);
