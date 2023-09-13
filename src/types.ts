@@ -11,7 +11,7 @@ export type PlayerWebSocket = {
 }
 
 export type Message = {
-    type: string;
+    type: number;
     gameIndex: number;
     playerId: number;
     value: string;
@@ -20,4 +20,9 @@ export type Message = {
 export type AddPlayerMessage = {
     name: string;
     imageUrl: string;
+}
+
+export type ChatGptResponse = {
+    success: boolean;
+    content: string;
 }

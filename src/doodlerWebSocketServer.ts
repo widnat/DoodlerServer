@@ -1,18 +1,17 @@
 import * as WebSocket from 'ws';
-import { Message, Game, PlayerWebSocket } from './types';
-const port = 8080;
+import { Message, Game, PlayerWebSocket, ChatGptResponse } from './types';
+import * as http from 'http';
+import { MessageType } from './doodler';
 let games = new Map<number, Game>();
 var newGameIndex = 0;
-import * as http from 'http';
 
 export default class DoodlerWebSocketServer {
-    CreateDoodlerWebSocketServer(server : http.Server) {
+    createDoodlerWebSocketServer(server : http.Server) {
         const webSocketServer = new WebSocket.Server({ server });
         webSocketServer.on('connection', (webSocket: WebSocket) => {
 
             webSocket.on('message', (message: string, isBinary) => {
                 handleClientMessage(message, isBinary)
-                // webSocket.send(`Hello, you sent -> ${message}`);
             });
             
             if (webSocket.protocol === "presenter") {
@@ -22,7 +21,7 @@ export default class DoodlerWebSocketServer {
                 } as Game;
                 games.set(newGameIndex, newGame);
                 var response = {
-                    type: "game index",
+                    type: MessageType.GameIndex,
                     value: String(newGameIndex)
                 } as Message;
                 var jsonResponse = JSON.stringify(response);
@@ -41,7 +40,7 @@ export default class DoodlerWebSocketServer {
                     game.playerWebSockets.push(playerWebSocket);
         
                     var response = {
-                        type: "player id",
+                        type: MessageType.PlayerId,
                         value: String(playerId)
                     } as Message;
                     var jsonResponse = JSON.stringify(response);
@@ -54,7 +53,7 @@ export default class DoodlerWebSocketServer {
             const message = JSON.parse(msg) as Message;
             var receivedMessage = "recieved message type: " + message.type;
             console.log(receivedMessage);
-            if (message.type === "add player" || message.type === "submit assignment doodle" || message.type === "submit first guess" || message.type === "submit second guess") {
+            if (message.type === MessageType.AddPlayer || message.type === MessageType.SubmitAssignmentDoodle || message.type === MessageType.SubmitFirstGuess || message.type === MessageType.SubmitSecondGuess) {
                 console.log("sending message to presenter");
                 var game = games.get(message.gameIndex);
                 if (game) {
@@ -63,7 +62,7 @@ export default class DoodlerWebSocketServer {
                     presenterWebSocket.send(msg);
                 }
             }
-            else if (message.type === "create doodle" || message.type === "sit back and relax" || message.type === "time to guess" || message.type === "time to guess again") {
+            else if (message.type === MessageType.CreateDoodle || message.type === MessageType.WaitingForOtherPlayers || message.type === MessageType.MakeAGuess || message.type === MessageType.ChooseYourAnswer) {
                 var sendingMessage = "sending message to playerId: " + message.playerId;
                 console.log(sendingMessage);
                 var game = games.get(message.gameIndex);
@@ -73,7 +72,6 @@ export default class DoodlerWebSocketServer {
                     playerWebSocket.webSocket.send(msg);
                 }
             }
-            
         }
     }
   }
