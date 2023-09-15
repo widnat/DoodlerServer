@@ -24,5 +24,5 @@ export type AddPlayerMessage = {
 
 export type ChatGptResponse = {
     success: boolean;
-    content: string;
+    contentList: [string];
 }

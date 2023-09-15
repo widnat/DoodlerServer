@@ -1,5 +1,5 @@
 export default class GptHelper {
-    getChatGptQuestion() {
+        getChatGptQuestion() {
         let action = 'ask me to draw something doing something'
         const contentList = 
         [ 
